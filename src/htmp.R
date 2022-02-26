@@ -86,8 +86,8 @@ pheatmap::pheatmap(mat[tmp$value[1:20],],
                    cluster_rows=FALSE,
                    breaks = seq(-3, 1, length.out=1000),
                    color=colorRampPalette(c("navy",
-                                            "navy",
-                                            "navy",
+                                            "blue",
+                                            "#a0a0fa",
                                             "white", 
                                             "red"))(1000), 
                    cluster_cols=FALSE, 
@@ -136,14 +136,17 @@ pheatmap::pheatmap(mat[tmp$value[1:20],] %>% magrittr::set_colnames(new_colnames
 
 pheatmap::pheatmap(mat[tmp$value[1:20],],
                    border_color = "black",
-                   cluster_rows=FALSE,breaks = seq(-3, 3, length.out=1000),
+                   cluster_rows=FALSE,
+                   breaks = seq(-3, 1, length.out=1000),
                    color=colorRampPalette(c("navy",
+                                            "blue",
+                                            "#a0a0fa",
                                             "white", 
-                                            "red"))(1000), 
+                                            "red"))(1000),  
                    cluster_cols=FALSE, 
                    annotation_row=tmp %>% column_to_rownames("value"), 
                    annotation_col = tmp2,
-                   na_col = 'grey', show_colnames=F,
+                   na_col = 'grey', show_colnames=T,
                    annotation_colors = ann_colors,
                    cellwidth = 10, cellheight = 10,
                    gaps_col = which(colnames(mat) %in% c(gaps-1, 553))
@@ -177,8 +180,6 @@ map_df(aa_groups, function(x) colMeans(mat[x,],na.rm = T), .id = "group") %>%
   mutate(Index= as.numeric(Index)) %>% 
   write_tsv("./output/grouped_aa_mean.tsv")
 
-
-
 map(aa_groups, function(x) colMeans(mat[x,],na.rm = T)) %>% 
   do.call(rbind, .) %>% 
   pheatmap(
@@ -188,7 +189,27 @@ map(aa_groups, function(x) colMeans(mat[x,],na.rm = T)) %>%
                                     "white", 
                                     "red"))(1000), 
            cluster_cols=FALSE)
+
+aa_group_mat <- map(aa_groups, function(x) colMeans(mat[x,],na.rm = T)) %>% 
+  do.call(rbind, .)
            
+pheatmap::pheatmap(map(aa_groups[1:6], function(x) colMeans(mat[x,],na.rm = T)) %>% 
+                     do.call(rbind, .),
+                   border_color = "black",
+                   cluster_rows=FALSE,
+                   #breaks = seq(-3, 3, length.out=1000),
+                   color=colorRampPalette(c("purple",
+                                            "white", 
+                                            "orange"))(1000), 
+                   cluster_cols=FALSE, 
+                   na_col = 'grey', 
+                   show_colnames=T,
+                   annotation_colors = ann_colors,
+                   cellwidth = 10, cellheight = 10,
+                   gaps_col = which(colnames(mat) %in% c(gaps-1, 553))
+                   
+                   ,
+                   filename = "aa-heatmap_large.pdf")
 
 # Export for Jason --------------------------------------------------------
 output <- File1_reformatted_SHOC2_callapsedToAA %>% left_join(
